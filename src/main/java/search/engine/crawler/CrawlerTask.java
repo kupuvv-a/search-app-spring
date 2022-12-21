@@ -16,12 +16,16 @@ import java.util.stream.Collectors;
 public class CrawlerTask extends RecursiveAction {
 
     private final String url;
+    private final long siteId;
     private final Set<String> checkedPage = new HashSet<>();
     private final IPagesChildrenParserService pageParserService;
+    private final IDaoPageService daoPageService;
 
-    public CrawlerTask(String url) {
+    public CrawlerTask(String url, long siteId, IDaoPageService daoPageService) {
+        this.siteId = siteId;
         this.url = url;
-        this.pageParserService = new PagesChildrenParserServiceImpl(url);
+        this.pageParserService = new PagesChildrenParserServiceImpl(url, siteId, daoPageService);
+        this.daoPageService = daoPageService;
     }
 
     @SneakyThrows
@@ -39,14 +43,14 @@ public class CrawlerTask extends RecursiveAction {
         checkedPage.addAll(pages);
         CrawlerChildrenPageCache.putPageChildrenIntoCache(url, pages);
 
-
         Set<String> children = CrawlerChildrenPageCache.getChildrenFromCache(url);
         if (!children.isEmpty() && !checkedPage.contains(url)) {
 
             Set<CrawlerTask> actions = new HashSet<>();
-            children.forEach(url -> actions.add(new CrawlerTask(url)));
+            children.forEach(url -> actions.add(new CrawlerTask(url, siteId, daoPageService)));
 
             invokeAll(actions);
         }
+
     }
 }

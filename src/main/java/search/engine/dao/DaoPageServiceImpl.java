@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 @Service
 public class DaoPageServiceImpl implements IDaoPageService {
 
-    @Autowired
     private final PageRepository pageRepository;
 
     public DaoPageServiceImpl(PageRepository pageRepository) {
@@ -21,5 +20,10 @@ public class DaoPageServiceImpl implements IDaoPageService {
     @Transactional
     public void savePage(Page aPage) {
         pageRepository.save(aPage);
+    }
+
+    @Override
+    public void deleteAllPages() {
+        pageRepository.deleteAll();
     }
 }

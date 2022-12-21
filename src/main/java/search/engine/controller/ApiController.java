@@ -4,7 +4,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import search.engine.message.ResultResponse;
 import search.engine.model.statistics.StatisticsResponse;
+import search.engine.service.IServiceIndex;
 import search.engine.service.IStatisticsService;
 
 
@@ -12,14 +14,22 @@ import search.engine.service.IStatisticsService;
 @RequestMapping("/api")
 public class ApiController {
 
-    private final IStatisticsService IStatisticsService;
+    private final IStatisticsService iStatisticsService;
+    private final IServiceIndex iServiceIndex;
 
-    public ApiController(IStatisticsService IStatisticsService) {
-        this.IStatisticsService = IStatisticsService;
+    public ApiController(IStatisticsService iStatisticsService, IServiceIndex iServiceIndex) {
+        this.iStatisticsService = iStatisticsService;
+        this.iServiceIndex = iServiceIndex;
     }
 
     @GetMapping("/statistics")
     public ResponseEntity<StatisticsResponse> statistics() {
-        return ResponseEntity.ok(IStatisticsService.getStatistics());
+        return ResponseEntity.ok(iStatisticsService.getStatistics());
     }
+
+    @GetMapping("/startIndexing")
+    public ResponseEntity<ResultResponse> startIndexing() {
+        return ResponseEntity.ok(iServiceIndex.runIndexing());
+    }
+
 }

@@ -2,13 +2,15 @@ package search.engine.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import search.engine.model.Site;
 
 import java.util.List;
 
-public interface SiteRepository  extends JpaRepository<Site, Long> {
+@Repository
+public interface SiteRepository extends JpaRepository<Site, Long> {
 
-    @Query(value = "SELECT * from site", nativeQuery = true)
+    @Query(value = "SELECT * FROM site", nativeQuery = true)
     List<Site> findAllContains();
 
 }

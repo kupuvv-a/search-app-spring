@@ -7,11 +7,8 @@ import search.engine.model.Page;
 
 import java.util.List;
 
-
 @Repository
 public interface PageRepository extends JpaRepository<Page, Long> {
-
-    @Query(value = "SELECT * from page", nativeQuery = true)
+    @Query(value = "SELECT * FROM page", nativeQuery = true)
     List<Page> findAllPages();
-
 }

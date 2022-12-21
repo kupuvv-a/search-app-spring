@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import search.engine.crawler.util.DomainUtil;
 import search.engine.dao.IDaoPageService;
 import search.engine.model.Page;
@@ -15,24 +13,36 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Service
 public class PagesChildrenParserServiceImpl implements IPagesChildrenParserService {
 
     private final String domain;
+    private final Page page;
+    private final long siteId;
+    private final IDaoPageService daoPageService;
 
-    public PagesChildrenParserServiceImpl(String pageUrl) {
+    public PagesChildrenParserServiceImpl(String pageUrl, long siteId, IDaoPageService daoPageService) {
+        this.siteId = siteId;
         this.domain = DomainUtil.getDomainFromUrl(pageUrl);
-
+        this.daoPageService = daoPageService;
+        this.page = new Page();
+        page.setPath(pageUrl);
     }
 
     @Override
     public Set<String> parsePageAndGetChildren(String pageUrl) throws IOException {
-        Connection.Response response = executeJsoupResponse(pageUrl);
+
+        final Connection.Response response = executeJsoupResponse(pageUrl);
+
+        page.setSiteId(this.siteId);
+        page.setCode(response.statusCode());
+
+        final Document document = getPageDocument(response);
+        page.setContent(document.html());
+        daoPageService.savePage(page);
+
         log.info("url: {} ; code: {}", pageUrl, response.statusCode());
 
-
-
-        return getPageChildren(response.parse(), pageUrl);
+        return getPageChildren(document, pageUrl);
     }
 
     private Connection.Response executeJsoupResponse(String pageUrl) throws IOException {
@@ -41,8 +51,11 @@ public class PagesChildrenParserServiceImpl implements IPagesChildrenParserServi
                 .userAgent(CrawlerConstant.USER_AGENT)
                 .timeout(CrawlerConstant.TIMEOUT)
                 .referrer("https://google.com")
-                .validateTLSCertificates(false)//deprecate!?
                 .execute();
+    }
+
+    private Document getPageDocument(Connection.Response aResponse) throws IOException {
+        return aResponse.parse();
     }
 
     private Set<String> getPageChildren(Document aDocument, String url) {
