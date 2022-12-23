@@ -1,4 +1,4 @@
-package search.engine.crawler.util;
+package search.engine.util;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

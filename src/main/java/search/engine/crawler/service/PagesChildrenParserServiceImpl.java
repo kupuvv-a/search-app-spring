@@ -2,73 +2,92 @@ package search.engine.crawler.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import search.engine.crawler.util.DomainUtil;
+import org.springframework.stereotype.Service;
+import search.engine.crawler.service.jsoup.IJsoupService;
 import search.engine.dao.IDaoPageService;
 import search.engine.model.Page;
+import search.engine.model.Site;
 
-import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Service
 public class PagesChildrenParserServiceImpl implements IPagesChildrenParserService {
 
-    private final String domain;
-    private final Page page;
-    private final long siteId;
-    private final IDaoPageService daoPageService;
+    private final String REG_FOR_URL = "/.+/?";
+    private final String REG_FOR_HTML = ".+.html";
 
-    public PagesChildrenParserServiceImpl(String pageUrl, long siteId, IDaoPageService daoPageService) {
-        this.siteId = siteId;
-        this.domain = DomainUtil.getDomainFromUrl(pageUrl);
+    private final IDaoPageService daoPageService;
+    private final IJsoupService jsoupService;
+
+    public PagesChildrenParserServiceImpl(IDaoPageService daoPageService, IJsoupService jsoupService) {
         this.daoPageService = daoPageService;
-        this.page = new Page();
-        page.setPath(pageUrl);
+        this.jsoupService = jsoupService;
     }
 
     @Override
-    public Set<String> parsePageAndGetChildren(String pageUrl) throws IOException {
+    public synchronized Set<Page>  parsePageAndGetChildrenPages(Page page, Site site) {
 
-        final Connection.Response response = executeJsoupResponse(pageUrl);
+        final Connection.Response response = jsoupService.executeJsoupResponse(page.getPath());
 
-        page.setSiteId(this.siteId);
-        page.setCode(response.statusCode());
+        final Document document = jsoupService.getDocument(response);
+        final   String  content = document.html();
 
-        final Document document = getPageDocument(response);
-        page.setContent(document.html());
-        daoPageService.savePage(page);
-
-        log.info("url: {} ; code: {}", pageUrl, response.statusCode());
-
-        return getPageChildren(document, pageUrl);
+        savePageOrUpdateContent(page, response, content);
+        return getChildrenPages(document, page.getPath(), site);
     }
 
-    private Connection.Response executeJsoupResponse(String pageUrl) throws IOException {
-        return Jsoup.connect(pageUrl)
-                .ignoreHttpErrors(true)
-                .userAgent(CrawlerConstant.USER_AGENT)
-                .timeout(CrawlerConstant.TIMEOUT)
-                .referrer("https://google.com")
-                .execute();
+    private void savePageOrUpdateContent(Page page, Connection.Response response, String content) {
+        Page dbPage = daoPageService.getPageByPath(page.getPath());
+        if (dbPage == null) {
+            page.setContent(content);
+            daoPageService.savePage(page);
+            log.info("page saved : {}", page.getPath());
+        } else {
+            if (dbPage.getContent() == null || !dbPage.getContent().equals(content)) {
+                daoPageService.updatePageContentByPath(dbPage.getPath(), content, response.statusCode());
+                log.info("page updated : {}", page.getPath());
+            }
+        }
     }
 
-    private Document getPageDocument(Connection.Response aResponse) throws IOException {
-        return aResponse.parse();
-    }
 
-    private Set<String> getPageChildren(Document aDocument, String url) {
-        return aDocument.select("a").stream()
+    private Set<Page> getChildrenPages(Document document, String url, Site site) {
+        return document.select("a").stream()
                 .map(element -> element.attr("href"))
-                .filter(s -> s.matches(url + CrawlerConstant.REG_FOR_URL) || s.matches("^" + CrawlerConstant.REG_FOR_URL))
-                .filter(s -> !s.matches(url + CrawlerConstant.REG_FOR_HTML) || !s.matches("^" + CrawlerConstant.REG_FOR_HTML))
-                .map(s -> {
-                    if (!s.startsWith(domain))
-                        return domain + s;
-                    else return s;
+                .filter(link -> link.matches(url + REG_FOR_URL) || link.matches("^" + REG_FOR_URL))
+                .filter(link -> !link.matches(url + REG_FOR_HTML) || !link.matches("^" + REG_FOR_HTML))
+                .map(link -> {
+                    if (!link.startsWith(site.getUrl()))
+                        return site.getUrl() + link;
+                    else return link;
                 })
+                .map(link -> createPageOrNull(link, site))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
+    }
+
+    private Page createPageOrNull(String path, Site site) {
+
+        Page page = daoPageService.getPageByPath(path);
+        if (page == null) {
+            Page newPage = createPage(path, site);
+            daoPageService.savePage(newPage);
+            return newPage;
+        }
+        return null;
+    }
+
+    private Page createPage(String path, Site site) {
+        Page page = new Page();
+        page.setPath(path);
+        page.setSite(site);
+//        page.setCode(status);
+//        page.setContent(content);
+        return page;
     }
 
 }

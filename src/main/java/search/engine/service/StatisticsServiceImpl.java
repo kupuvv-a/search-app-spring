@@ -2,8 +2,8 @@ package search.engine.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import search.engine.config.Site;
-import search.engine.config.SitesList;
+import search.engine.config.ConfigSite;
+import search.engine.config.SitesFromConfig;
 import search.engine.model.statistics.DetailedStatisticsItem;
 import search.engine.model.statistics.StatisticsData;
 import search.engine.model.statistics.StatisticsResponse;
@@ -18,7 +18,7 @@ import java.util.Random;
 public class StatisticsServiceImpl implements IStatisticsService {
 
     private final Random random = new Random();
-    private final SitesList sites;
+    private final SitesFromConfig sites;
 
     @Override
     public StatisticsResponse getStatistics() {
@@ -30,16 +30,16 @@ public class StatisticsServiceImpl implements IStatisticsService {
         };
 
         TotalStatistics total = new TotalStatistics();
-        total.setSites(sites.getSites().size());
+        total.setSites(sites.getConfigSites().size());
         total.setIndexing(true);
 
         List<DetailedStatisticsItem> detailed = new ArrayList<>();
-        List<Site> sitesList = sites.getSites();
+        List<ConfigSite> sitesList = sites.getConfigSites();
         for (int i = 0; i < sitesList.size(); i++) {
-            Site site = sitesList.get(i);
+            ConfigSite configSite = sitesList.get(i);
             DetailedStatisticsItem item = new DetailedStatisticsItem();
-            item.setName(site.getName());
-            item.setUrl(site.getUrl());
+            item.setName(configSite.getName());
+            item.setUrl(configSite.getUrl());
             int pages = random.nextInt(1_000);
             int lemmas = pages * random.nextInt(1_000);
             item.setPages(pages);

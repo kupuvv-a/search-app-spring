@@ -17,7 +17,7 @@ spring:
 # example values
 #
 indexing-settings:
-  sites:
+  configSites:
 #    - url: https://www.lenta.ru
 #      name: Лента.ру
     - url: https://www.skillbox.ru

@@ -3,54 +3,42 @@ package search.engine.crawler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import search.engine.crawler.service.IPagesChildrenParserService;
-import search.engine.crawler.service.PagesChildrenParserServiceImpl;
-import search.engine.crawler.util.CrawlerChildrenPageCache;
 import search.engine.dao.IDaoPageService;
+import search.engine.model.Page;
+import search.engine.model.Site;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.RecursiveAction;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class CrawlerTask extends RecursiveAction {
 
     private final String url;
-    private final long siteId;
-    private final Set<String> checkedPage = new HashSet<>();
-    private final IPagesChildrenParserService pageParserService;
+    private final Site site;
     private final IDaoPageService daoPageService;
+    private final IPagesChildrenParserService pageParserService;
 
-    public CrawlerTask(String url, long siteId, IDaoPageService daoPageService) {
-        this.siteId = siteId;
+    public CrawlerTask(String url, Site site, IDaoPageService daoPageService, IPagesChildrenParserService pageParserService) {
         this.url = url;
-        this.pageParserService = new PagesChildrenParserServiceImpl(url, siteId, daoPageService);
+        this.site = site;
         this.daoPageService = daoPageService;
+        this.pageParserService = pageParserService;
     }
 
     @SneakyThrows
     @Override
     protected void compute() {
 
-        Thread.sleep((int) (Math.random() * 100));
+        final Page newPage = new Page();
+        newPage.setSite(this.site);
+        newPage.setPath(this.url);
 
-        Set<String> pages = pageParserService.parsePageAndGetChildren(url)
-                .stream()
-                .filter(s -> !checkedPage.contains(url))
-                .filter(s -> s.startsWith(url) && (s.length() > url.length()))
-                .collect(Collectors.toSet());
-
-        checkedPage.addAll(pages);
-        CrawlerChildrenPageCache.putPageChildrenIntoCache(url, pages);
-
-        Set<String> children = CrawlerChildrenPageCache.getChildrenFromCache(url);
-        if (!children.isEmpty() && !checkedPage.contains(url)) {
-
+        Set<Page> children = pageParserService.parsePageAndGetChildrenPages(newPage, this.site);
+        if (children != null && !children.isEmpty()) {
             Set<CrawlerTask> actions = new HashSet<>();
-            children.forEach(url -> actions.add(new CrawlerTask(url, siteId, daoPageService)));
-
+            children.forEach(child -> actions.add(new CrawlerTask(child.getPath(), this.site, daoPageService, pageParserService)));
             invokeAll(actions);
         }
-
     }
 }

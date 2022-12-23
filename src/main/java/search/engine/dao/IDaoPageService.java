@@ -6,6 +6,9 @@ public interface IDaoPageService {
 
     void savePage(Page aPage);
 
-    void deleteAllPages();
+    Page getPageByPath(String path);
 
+    void updatePageContentByPath(String path, String content, int code);
+
+    void deleteAllPages();
 }

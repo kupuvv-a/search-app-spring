@@ -16,8 +16,9 @@ public class Page {
     @Id
     Long id;
 
-    @Column(name = "site_id", nullable = false, unique = true)
-    Long siteId;
+    @ManyToOne
+    @JoinColumn(name = "site_id", nullable = false)
+    Site site;
 
     @Column(nullable = false, unique = true)
     String path;
@@ -25,7 +26,6 @@ public class Page {
     @Column(nullable = false)
     int code;
 
-    @Column(nullable = false, unique = true)
     String content;
 
 }

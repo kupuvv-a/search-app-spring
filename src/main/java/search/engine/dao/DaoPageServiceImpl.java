@@ -1,6 +1,5 @@
 package search.engine.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import search.engine.model.Page;
 import search.engine.repository.PageRepository;
@@ -25,5 +24,15 @@ public class DaoPageServiceImpl implements IDaoPageService {
     @Override
     public void deleteAllPages() {
         pageRepository.deleteAll();
+    }
+
+    @Override
+    public Page getPageByPath(String url) {
+        return pageRepository.findPageByUrl(url);
+    }
+
+    @Override
+    public void updatePageContentByPath(String path, String content, int code) {
+        pageRepository.updatePageContent(path, content, code);
     }
 }

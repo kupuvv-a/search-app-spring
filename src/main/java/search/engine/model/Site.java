@@ -13,17 +13,17 @@ import java.sql.Date;
 @Setter
 public class Site {
 
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
     Long id;
 
-    @Column(nullable = false, unique = true, columnDefinition = "ENUM('INDEXING', 'INDEXED', 'FAILED')")
+    @Column(nullable = false, columnDefinition = "ENUM('INDEXING', 'INDEXED', 'FAILED')")
     String status;
 
-    @Column(name = "status_time", nullable = false, unique = true)
+    @Column(name = "status_time", nullable = false)
     Date statusTime;
 
-    @Column(name = "last_error", nullable = false, unique = true)
+    @Column(name = "last_error", nullable = false)
     String lastError;
 
     @Column(nullable = false, unique = true)
