@@ -14,6 +14,8 @@ public interface IDaoSiteService {
 
     void updateSiteStatus(String url, String statusType);
 
+    void updateSite(Site site);
+
     List<Site> getAllSites();
 
     void deleteAllSites();

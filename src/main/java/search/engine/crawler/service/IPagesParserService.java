@@ -6,6 +6,7 @@ import search.engine.model.Site;
 import java.io.IOException;
 import java.util.Set;
 
-public interface IPagesChildrenParserService {
-    Set<Page> parsePageAndGetChildrenPages(Page page, Site site) throws IOException;
+public interface IPagesParserService {
+
+    Set<Page> getPageChildren(Page page, Site site) throws IOException;
 }

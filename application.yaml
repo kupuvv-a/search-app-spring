@@ -22,5 +22,5 @@ indexing-settings:
 #      name: Лента.ру
     - url: https://www.skillbox.ru
       name: Skillbox
-#    - url: https://www.playback.ru
-#      name: PlayBack.Ru
+    - url: https://www.playback.ru
+      name: PlayBack.Ru

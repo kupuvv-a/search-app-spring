@@ -12,6 +12,10 @@ import search.engine.repository.PageRepository;
 import search.engine.repository.SiteRepository;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest
@@ -32,6 +36,13 @@ public class IDaoPageServiceTest {
     }
 
     @Test
+    void getPagesBySiteId() {
+        IDaoPageService daoPageService = new DaoPageServiceImpl(pageRepository);
+        List<Page> pages = daoPageService.getPagesBySiteId(8417);
+        pages.forEach(page -> System.out.println(page.getPath()));
+    }
+
+    @Test
     void updatePage() throws InterruptedException {
 
         IDaoSiteService daoSiteService = new DaoSiteServiceImpl(siteRepository);
@@ -39,7 +50,8 @@ public class IDaoPageServiceTest {
         final String url = "http://test.example";
         site.setName("test");
         site.setUrl(url);
-        site.setStatusTime(new Date(System.currentTimeMillis()));
+//        site.setStatusTime(new Date(System.currentTimeMillis()));
+        site.setStatusTime(new Timestamp(System.currentTimeMillis()));
         site.setLastError("null");
         site.setStatus(StatusType.INDEXING.name());
 

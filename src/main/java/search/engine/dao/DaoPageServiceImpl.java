@@ -5,6 +5,7 @@ import search.engine.model.Page;
 import search.engine.repository.PageRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class DaoPageServiceImpl implements IDaoPageService {
@@ -17,13 +18,18 @@ public class DaoPageServiceImpl implements IDaoPageService {
 
     @Override
     @Transactional
-    public void savePage(Page aPage) {
-        pageRepository.save(aPage);
+    public Page savePage(Page aPage) {
+       return pageRepository.save(aPage);
     }
 
     @Override
     public void deleteAllPages() {
         pageRepository.deleteAll();
+    }
+
+    @Override
+    public List<Page> getPagesBySiteId(long siteId) {
+        return pageRepository.findPagesBySiteId(siteId);
     }
 
     @Override
@@ -34,5 +40,10 @@ public class DaoPageServiceImpl implements IDaoPageService {
     @Override
     public void updatePageContentByPath(String path, String content, int code) {
         pageRepository.updatePageContent(path, content, code);
+    }
+
+    @Override
+    public void updatePage(Page page) {
+        pageRepository.updatePage(page.getId(), page.getContent(), page.getCode());
     }
 }

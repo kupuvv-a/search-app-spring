@@ -1,4 +1,4 @@
-package search.engine.crawler.service.jsoup;
+package search.engine.crawler.service;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -22,6 +22,7 @@ public class JsoupServiceImpl implements IJsoupService {
                     .referrer("https://google.com")
                     .execute();
         } catch (IOException e) {
+            //
             throw new ResponseStatusException(HttpStatus.REQUEST_TIMEOUT, "Cannot get JSOUP response : " + e.getMessage());
         }
     }
@@ -31,8 +32,7 @@ public class JsoupServiceImpl implements IJsoupService {
         try {
             return aResponse.parse();
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot parse  page : " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot parse page : " + e.getMessage());
         }
     }
-
 }

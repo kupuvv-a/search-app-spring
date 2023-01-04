@@ -1,4 +1,4 @@
-package search.engine.crawler.service.jsoup;
+package search.engine.crawler.service;
 
 class Constant {
     static final    int TIMEOUT    = 60 * 1000;
