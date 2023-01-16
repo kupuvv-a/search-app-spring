@@ -14,10 +14,9 @@ import search.engine.message.ResultResponse;
 import search.engine.model.Site;
 import search.engine.model.StatusType;
 
-import java.sql.Date;
+import java.io.IOException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.concurrent.ForkJoinPool;
 
 @Service
@@ -43,11 +42,18 @@ public class ServiceIndexImpl implements IServiceIndex {
             site.setStatusTime(new Timestamp(System.currentTimeMillis()));
             daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXING.name());
 
-            Connection.Response response = jsoupService.executeJsoupResponse(site.getUrl());
-            if (response.statusCode() == 200) {
-                ForkJoinPool forkJoinPool = new ForkJoinPool(10);
-                forkJoinPool.invoke(new CrawlerTask(site.getUrl(), site, pagesChildrenParserService));
-                daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXED.name());
+            try {
+                Connection.Response response = jsoupService.executeJsoupResponse(site.getUrl());
+                if (response.statusCode() == 200) { // может и не надо подумай !
+                    ForkJoinPool forkJoinPool = new ForkJoinPool(10);
+                    forkJoinPool.invoke(new CrawlerTask(site.getUrl(), site, pagesChildrenParserService));
+                    daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXED.name());
+                }
+            } catch (IOException e) {
+                site.setStatusTime(new Timestamp(System.currentTimeMillis()));
+                site.setStatus(StatusType.FAILED.name());
+                site.setLastError(e.getMessage().toLowerCase(Locale.ROOT));
+                daoSiteService.updateSite(site);
             }
         });
         return new ResultResponse("true");

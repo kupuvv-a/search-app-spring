@@ -11,10 +11,7 @@ import search.engine.model.StatusType;
 import search.engine.repository.PageRepository;
 import search.engine.repository.SiteRepository;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 

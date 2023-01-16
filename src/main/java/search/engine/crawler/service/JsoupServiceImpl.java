@@ -13,18 +13,15 @@ import java.io.IOException;
 public class JsoupServiceImpl implements IJsoupService {
 
     @Override
-    public Connection.Response executeJsoupResponse(String pageUrl) {
-        try {
+    public Connection.Response executeJsoupResponse(String pageUrl) throws IOException {
+
             return Jsoup.connect(pageUrl)
                     .ignoreHttpErrors(true)
                     .userAgent(Constant.USER_AGENT)
                     .timeout(Constant.TIMEOUT)
                     .referrer("https://google.com")
                     .execute();
-        } catch (IOException e) {
-            //
-            throw new ResponseStatusException(HttpStatus.REQUEST_TIMEOUT, "Cannot get JSOUP response : " + e.getMessage());
-        }
+
     }
 
     @Override

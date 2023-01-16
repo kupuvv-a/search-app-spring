@@ -9,6 +9,7 @@ import search.engine.dao.IDaoPageService;
 import search.engine.model.Page;
 import search.engine.model.Site;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,7 +30,7 @@ public class PagesParserServiceImpl implements IPagesParserService {
     }
 
     @Override
-    public synchronized Set<Page> getPageChildren(Page page, final Site site) {
+    public synchronized Set<Page> getPageChildren(Page page, final Site site) throws IOException {
 
         final Connection.Response response = jsoupService.executeJsoupResponse(page.getPath());
 
@@ -42,6 +43,7 @@ public class PagesParserServiceImpl implements IPagesParserService {
 
 
     private void savePageOrUpdateContent(Page page, Connection.Response response, String content) {
+
         Page dbPage = daoPageService.getPageByPath(page.getPath());
         if (dbPage == null) {
             page.setContent(content);
