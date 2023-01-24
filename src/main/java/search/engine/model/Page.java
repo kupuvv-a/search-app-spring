@@ -5,15 +5,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.persistence.Index;
 
-@Entity(name = "page")
+@Entity
+@Table(name = "page", indexes = @Index(name = "pathPage", columnList = "path"))
 @NoArgsConstructor
 @Getter
 @Setter
 public class Page {
 
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @ManyToOne

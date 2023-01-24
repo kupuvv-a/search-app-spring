@@ -29,12 +29,6 @@ public class StatisticsServiceImpl implements IStatisticsService {
 
     @Override
     public StatisticsResponse getStatistics() {
-        String[] statuses = {"INDEXED", "FAILED", "INDEXING"};
-        String[] errors = {
-                "Ошибка индексации: главная страница сайта не доступна",
-                "Ошибка индексации: сайт не доступен",
-                ""
-        };
 
         List<Site> sites = daoSiteService.getAllSites();
 

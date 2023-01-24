@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @Setter
 public class Site {
 
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     Long id;
 
