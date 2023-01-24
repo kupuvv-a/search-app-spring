@@ -5,7 +5,6 @@ import search.engine.model.Site;
 import search.engine.repository.SiteRepository;
 
 import javax.transaction.Transactional;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,7 +35,7 @@ public class DaoSiteServiceImpl implements IDaoSiteService {
 
     @Override
     public void updateSite(Site site) {
-        siteRepository.updateSite(site.getStatus(), site.getStatusTime(), site.getLastError(), site.getUrl(),  site.getName());
+        siteRepository.updateSite(site.getStatus(), site.getStatusTime(), site.getLastError(), site.getUrl(), site.getName());
 
     }
 

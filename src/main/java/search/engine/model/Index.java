@@ -18,7 +18,7 @@ public class Index {
 
     @ManyToOne
     @JoinColumn(name = "page_id")
-     Page page;
+    Page page;
 
     @ManyToOne
     @JoinColumn(name = "lemma_id")

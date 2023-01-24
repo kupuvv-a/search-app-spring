@@ -19,7 +19,7 @@ public class DaoPageServiceImpl implements IDaoPageService {
     @Override
     @Transactional
     public Page savePage(Page aPage) {
-       return pageRepository.save(aPage);
+        return pageRepository.save(aPage);
     }
 
     @Override

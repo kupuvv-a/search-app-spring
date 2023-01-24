@@ -33,7 +33,7 @@ public class ApiController {
         return ResponseEntity.ok(iServiceIndex.runIndexing());
     }
 
-    //todo escape all unwanted char
+    //todo escaping all unwanted char
     @PostMapping("/indexPage")
     public ResponseEntity<ResultResponse> startIndexing(String url) {
         return ResponseEntity.ok(iServiceIndex.runIndexing(url));

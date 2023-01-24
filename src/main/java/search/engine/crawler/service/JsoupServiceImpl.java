@@ -15,12 +15,12 @@ public class JsoupServiceImpl implements IJsoupService {
     @Override
     public Connection.Response executeJsoupResponse(String pageUrl) throws IOException {
 
-            return Jsoup.connect(pageUrl)
-                    .ignoreHttpErrors(true)
-                    .userAgent(Constant.USER_AGENT)
-                    .timeout(Constant.TIMEOUT)
-                    .referrer("https://google.com")
-                    .execute();
+        return Jsoup.connect(pageUrl)
+                .ignoreHttpErrors(true)
+                .userAgent(Constant.USER_AGENT)
+                .timeout(Constant.TIMEOUT)
+                .referrer("https://google.com")
+                .execute();
 
     }
 

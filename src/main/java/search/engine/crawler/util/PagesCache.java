@@ -3,8 +3,6 @@ package search.engine.crawler.util;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import search.engine.model.Page;
 
 import java.util.concurrent.TimeUnit;
@@ -12,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class PagesCache {
 
-    private static final long MAX_CACHE_SIZE               = 100 * 100;
+    private static final long MAX_CACHE_SIZE = 100 * 100;
     private static final long SESSIONS_LIFETIME_IN_MINUTES = 60;
 
     private static final Cache<String, Page> CHECKED_PAGES_CACHE;

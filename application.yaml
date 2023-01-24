@@ -18,11 +18,13 @@ spring:
 #
 indexing-settings:
   configSites:
-#    - url: https://www.lenta.ru
-#      name: Лента.ру
+    #    - url: https://www.lenta.ru
+    #      name: Лента.ру
     - url: https://www.skillbox.ru
       name: Skillbox
+    - url: https://www.module.ru
+      name: Module
     - url: https://www.playback.ru
       name: PlayBack.Ru
-    - url: https://www.erroe.test
+    - url: https://www.error.test
       name: test.error
