@@ -8,7 +8,7 @@ import java.util.*;
 
 public class LemmaFinder {
     private final LuceneMorphology luceneMorphology;
-    private static final String  WORD_TYPE_REGEX = "\\W\\w&&[^а-яА-Я\\s]";
+    private static final String WORD_TYPE_REGEX = "\\W\\w&&[^а-яА-Я\\s]";
     private static final String[] particlesNames = new String[]{"МЕЖД", "ПРЕДЛ", "СОЮЗ"};
 
     public static LemmaFinder getInstance() throws IOException {
@@ -41,7 +41,6 @@ public class LemmaFinder {
 
             if (lemmas.containsKey(normalWord)) lemmas.put(normalWord, lemmas.get(normalWord) + 1);
             else lemmas.put(normalWord, 1);
-
         }
         return lemmas;
     }
