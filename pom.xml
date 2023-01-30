@@ -21,7 +21,7 @@
         <maven.compiler.target>17</maven.compiler.target>
 
 
-        <jsoup.version>1.11.3</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
 
 
         <slf4j.version>1.7.30</slf4j.version>
