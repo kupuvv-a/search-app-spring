@@ -24,28 +24,27 @@ import java.util.concurrent.ForkJoinPool;
 @Slf4j
 public class ServiceIndexImpl implements IServiceIndex {
 
-    private final SitesFromConfig configSites;
-    private final IDaoSiteService daoSiteService;
     private final IPagesParserService pagesChildrenParserService;
-    private final IJsoupService jsoupService;
+    private final     SitesFromConfig configSites;
+    private final     IDaoSiteService daoSiteService;
+    private final       IJsoupService jsoupService;
 
     @Override
     public ResultResponse runIndexing() {
 
         checkPropertyAndDbUpdate();
-
+        //todo check indexing start
         daoSiteService.getAllSites().forEach(site -> {
 
             log.info("run indexing site url : {}", site.getUrl());
-
             site.setStatus(StatusType.INDEXING.name());
             site.setStatusTime(new Timestamp(System.currentTimeMillis()));
             daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXING.name());
 
             try {
-                Connection.Response response = jsoupService.executeJsoupResponse(site.getUrl());
-                if (response.statusCode() == 200) { // может и не надо подумай !
-                    ForkJoinPool forkJoinPool = new ForkJoinPool(10);
+                final Connection.Response response = jsoupService.executeJsoupResponse(site.getUrl());
+                if (response.statusCode() == 200) { // может и не надо, подумай !
+                    final ForkJoinPool forkJoinPool = new ForkJoinPool(10);
                     forkJoinPool.invoke(new CrawlerTask(site.getUrl(), site, pagesChildrenParserService));
                     daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXED.name());
                 }
@@ -56,30 +55,40 @@ public class ServiceIndexImpl implements IServiceIndex {
                 daoSiteService.updateSite(site);
             }
         });
-        return new ResultResponse("true");
+        return new ResultResponse("true", null);
     }
 
     @Override
-    public ResultResponse runIndexing(String url) {
+    public ResultResponse runIndexing(final String url) {
         Site site = daoSiteService.getSiteByUrl(url);
         if (site == null) {
-            site = createSiteFromUrl(url);
-            daoSiteService.saveSite(site);
+            log.info("site url: {} was not found", url);
+            try {
+                final Connection.Response response = jsoupService.executeJsoupResponse(url);
+                if (response.statusCode() == 200) {
+                    site = createSiteFromUrl(url);
+                    daoSiteService.saveSite(site);
+                    log.info("new site was create : {}", site.getUrl());
+                } else return new ResultResponse("false", "Bad site url: " + url);
+
+            } catch (IOException e) {
+                return new ResultResponse("false", e.getMessage());
+            }
         }
 
         log.info("run indexing site url : {}", site.getUrl());
-        daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXING.name());
+        if (!site.getStatus().equals(StatusType.INDEXING.name()))
+            daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXING.name());
 
-        ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+        final ForkJoinPool forkJoinPool = new ForkJoinPool(4);
         forkJoinPool.invoke(new CrawlerTask(site.getUrl(), site, pagesChildrenParserService));
-
         daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXED.name());
-        return new ResultResponse("true");
+        return new ResultResponse("true", null);
     }
 
 
-    private Site createSiteFromUrl(String url) {
-        Site site = new Site();
+    private Site createSiteFromUrl(final String url) {
+        final Site site = new Site();
         site.setUrl(url);
         site.setName(url.substring(7, 17));//todo replace this shit
         site.setStatusTime(new Timestamp(System.currentTimeMillis()));
@@ -91,17 +100,17 @@ public class ServiceIndexImpl implements IServiceIndex {
     private void checkPropertyAndDbUpdate() {
         configSites.getConfigSites().forEach(s -> {
             if (daoSiteService.getSiteByName(s.getName()) == null)
-                daoSiteService.saveSite(createNewSiteFromConfig(s, StatusType.INDEXING));
+                daoSiteService.saveSite(createNewSiteFromConfig(s));
         });
     }
 
-    private Site createNewSiteFromConfig(ConfigSite s, StatusType statusType) {
-        Site site = new Site();
-        site.setUrl(s.getUrl());
-        site.setName(s.getName());
+    private Site createNewSiteFromConfig(final ConfigSite aSite) {
+        final Site site = new Site();
+        site.setUrl(aSite.getUrl());
+        site.setName(aSite.getName());
         site.setStatusTime(new Timestamp(System.currentTimeMillis()));
         site.setLastError("null");
-        site.setStatus(statusType.name());
+        site.setStatus(StatusType.INDEXING.name());
         return site;
     }
 }
