@@ -6,10 +6,10 @@ import org.jsoup.Connection;
 import org.springframework.stereotype.Service;
 import search.engine.config.ConfigSite;
 import search.engine.config.SitesFromConfig;
-import search.engine.crawler.CrawlerTask;
-import search.engine.crawler.service.IJsoupService;
-import search.engine.crawler.service.IPagesParserService;
+import search.engine.microservice.crawler.CrawlerTask;
+import search.engine.microservice.crawler.service.IPagesParserService;
 import search.engine.dao.IDaoSiteService;
+import search.engine.microservice.jsoup.service.IJsoupService;
 import search.engine.message.ResultResponse;
 import search.engine.model.Site;
 import search.engine.model.StatusType;
@@ -25,9 +25,9 @@ import java.util.concurrent.ForkJoinPool;
 public class ServiceIndexImpl implements IServiceIndex {
 
     private final IPagesParserService pagesChildrenParserService;
-    private final     SitesFromConfig configSites;
-    private final     IDaoSiteService daoSiteService;
-    private final       IJsoupService jsoupService;
+    private final SitesFromConfig configSites;
+    private final IDaoSiteService daoSiteService;
+    private final IJsoupService jsoupService;
 
     @Override
     public ResultResponse runIndexing() {

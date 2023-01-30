@@ -1,8 +1,8 @@
-package search.engine.crawler;
+package search.engine.microservice.crawler;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import search.engine.crawler.service.IPagesParserService;
+import search.engine.microservice.crawler.service.IPagesParserService;
 import search.engine.model.Page;
 import search.engine.model.Site;
 

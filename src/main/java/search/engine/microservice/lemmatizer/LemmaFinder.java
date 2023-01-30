@@ -1,4 +1,4 @@
-package search.engine.lemmatizer;
+package search.engine.microservice.lemmatizer;
 
 import org.apache.lucene.morphology.LuceneMorphology;
 import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
@@ -45,6 +45,7 @@ public class LemmaFinder {
         return lemmas;
     }
 
+    //todo unused
     public Set<String> getLemmaSet(final String text) {
         final String[] textArray = arrayContainsRussianWords(text);
         final Set<String> lemmaSet = new HashSet<>();

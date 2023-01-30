@@ -1,4 +1,4 @@
-package search.engine.crawler.service;
+package search.engine.microservice.crawler.service;
 
 import search.engine.model.Page;
 import search.engine.model.Site;

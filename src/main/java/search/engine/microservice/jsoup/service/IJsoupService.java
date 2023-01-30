@@ -1,4 +1,4 @@
-package search.engine.crawler.service;
+package search.engine.microservice.jsoup.service;
 
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
@@ -11,4 +11,6 @@ public interface IJsoupService {
     Connection.Response executeJsoupResponse(String pageUrl) throws IOException;
 
     Document getDocument(Connection.Response aResponse);
+
+    String cleanHtmlTags(String htmlDocument);
 }

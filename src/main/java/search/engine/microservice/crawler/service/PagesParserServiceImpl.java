@@ -1,11 +1,12 @@
-package search.engine.crawler.service;
+package search.engine.microservice.crawler.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
-import search.engine.crawler.util.PagesCache;
+import search.engine.microservice.crawler.util.PagesCache;
 import search.engine.dao.IDaoPageService;
+import search.engine.microservice.jsoup.service.IJsoupService;
 import search.engine.model.Page;
 import search.engine.model.Site;
 
