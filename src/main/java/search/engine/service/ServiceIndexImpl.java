@@ -6,11 +6,11 @@ import org.jsoup.Connection;
 import org.springframework.stereotype.Service;
 import search.engine.config.ConfigSite;
 import search.engine.config.SitesFromConfig;
+import search.engine.dao.IDaoSiteService;
+import search.engine.message.ResultResponse;
 import search.engine.microservice.crawler.CrawlerTask;
 import search.engine.microservice.crawler.service.IPagesParserService;
-import search.engine.dao.IDaoSiteService;
 import search.engine.microservice.jsoup.service.IJsoupService;
-import search.engine.message.ResultResponse;
 import search.engine.model.Site;
 import search.engine.model.StatusType;
 
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Locale;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +30,26 @@ public class ServiceIndexImpl implements IServiceIndex {
     private final IDaoSiteService daoSiteService;
     private final IJsoupService jsoupService;
 
+
+    //todo :
     @Override
-    public ResultResponse runIndexing() {
+    public boolean stopIndexing() {
+        return false;
+    }
+
+    @Override
+    public boolean runIndexing() {
 
         checkPropertyAndDbUpdate();
-        //todo check indexing start
+
+        AtomicBoolean isIndexing = new AtomicBoolean(false);
+        daoSiteService.getAllSites().forEach(site -> {
+            if (site.getStatus().equals(StatusType.INDEXING.name()))
+                isIndexing.set(true);
+        });
+        if (isIndexing.get())
+            return true;
+
         daoSiteService.getAllSites().forEach(site -> {
 
             log.info("run indexing site url : {}", site.getUrl());
@@ -43,7 +59,7 @@ public class ServiceIndexImpl implements IServiceIndex {
 
             try {
                 final Connection.Response response = jsoupService.executeJsoupResponse(site.getUrl());
-                if (response.statusCode() == 200) { // может и не надо, подумай !
+                if (response.statusCode() == 200) {
                     final ForkJoinPool forkJoinPool = new ForkJoinPool(10);
                     forkJoinPool.invoke(new CrawlerTask(site.getUrl(), site, pagesChildrenParserService));
                     daoSiteService.updateSiteStatus(site.getUrl(), StatusType.INDEXED.name());
@@ -55,7 +71,7 @@ public class ServiceIndexImpl implements IServiceIndex {
                 daoSiteService.updateSite(site);
             }
         });
-        return new ResultResponse("true", null);
+        return false;
     }
 
     @Override
@@ -110,7 +126,7 @@ public class ServiceIndexImpl implements IServiceIndex {
         site.setName(aSite.getName());
         site.setStatusTime(new Timestamp(System.currentTimeMillis()));
         site.setLastError("null");
-        site.setStatus(StatusType.INDEXING.name());
+        site.setStatus(StatusType.CREATED.name());
         return site;
     }
 }

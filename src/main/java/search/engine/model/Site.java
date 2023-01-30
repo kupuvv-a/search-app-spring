@@ -17,7 +17,7 @@ public class Site {
     @Id
     Long id;
 
-    @Column(nullable = false, columnDefinition = "ENUM('INDEXING', 'INDEXED', 'FAILED')")
+    @Column(nullable = false, columnDefinition = "ENUM('INDEXING', 'INDEXED', 'FAILED', 'CREATED')")
     String status;
 
     @Column(name = "status_time", columnDefinition = "DATETIME", nullable = false)
